@@ -12,6 +12,58 @@
   { id: 99, name: 'lucy', managerId: 1}
 ];
 
+const findEmployeeByName = (name, list)=> {
+  return list.find( e => e.name === name);
+};
+
+const findManagerFor = (employee, employees)=> {
+  return employees.find(e => e.id === employee.managerId);
+};
+
+const findCoworkersFor = (employee, employees)=> {
+  return employees
+    .filter( e => e.managerId === employee.managerId && e.id !== employee.id);
+};
+
+const findManagementChainForEmployee = (employee, employees)=> {
+  const results = [];
+  let current = employee;
+  while(current = findManagerFor(current, employees)){
+    results.unshift(current);
+  }
+  return results;
+
+
+};
+
+const addReports = (employee, employees)=>{
+  const reports = employees.filter( e => e.managerId === employee.id);
+  reports.forEach( report => {
+    const _report = {...report, reports: [] };
+    employee.reports.push(_report);
+    addReports(_report, employees);
+  });
+}
+
+const generateManagementTree = (employees)=> {
+  const root = {...employees.find( e => !e.managerId), reports: []};
+  addReports(root, employees);
+  return root;
+};
+
+const displayManagementTree = (tree)=> {
+  const display = (employee, level=0)=> {
+    const prefix = new Array(level).fill('-').join('');
+    console.log(`${prefix}${ employee.name }`);
+    employee.reports.forEach( report => {
+      level++;
+      display(report, level);
+      level--;
+    });
+  }
+
+  display(tree);
+};
 const spacer = (text)=> {
   if(!text){
     return console.log('');
